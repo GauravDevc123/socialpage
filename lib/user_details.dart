@@ -9,32 +9,55 @@ class UserDetailsPage extends StatelessWidget {
   UserDetailsPage(this.uid);
   @override
   Widget build(BuildContext context) {
+    var doc = null;
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            Expanded(
-                child: StreamBuilder(
-                    stream: collectionReference.doc("users").snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      var userDoc = snapshot.data as Map;
-                      return new Column(
-                        children: [
-                          Text(userDoc["UserName"]),
-                          Text(userDoc["age"]),
-                          Text(userDoc["bio"]),
-                          Text(userDoc["hometown"]),
-                        ],
-                      );
-                    })),
-          ],
-        ),
-      ),
-    );
+        body: Center(
+      child: Column(children: [
+        Expanded(
+            child: StreamBuilder(
+                stream: collectionReference.snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    Iterable<QueryDocumentSnapshot<Object?>> itr = snapshot
+                        .data!.docs
+                        .where((element) => element["uid"] == uid);
+                    doc = itr.first;
+                  }
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: 100,
+                      ),
+                      Text(doc["UserName"]),
+                      SizedBox(
+                        height: 60,
+                      ),
+                      Text(doc["hometown"]),
+                      SizedBox(
+                        height: 60,
+                      ),
+                      Text(doc["bio"]),
+                      SizedBox(
+                        height: 60,
+                      ),
+                      Text(doc["age"]),
+                      SizedBox(
+                        height: 60,
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Back to User List"),
+                      )
+                    ],
+                  );
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                })),
+      ]),
+    ));
   }
 }
